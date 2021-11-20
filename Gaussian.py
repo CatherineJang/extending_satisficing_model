@@ -36,3 +36,31 @@ class Gaussian:
       Returns the value of the integral from negative to positive infinity of the Gaussian
     """
     return math.sqrt(2*math.pi)*self.var*self.coef
+
+class GaussGroup:
+  def __init__(self, startPop=False):
+    self.gaussList = []
+    if startPop:
+      self.gaussList = [Gaussian(1/math.sqrt(2*math.pi),1,0)]
+
+  def multiply(self, gaussian: Gaussian):
+    newGroup = GaussGroup()
+    newGroup.gaussList = list(map(lambda g: g.multiply(gaussian), self.gaussList))
+    return newGroup
+  
+  def rationalize(self, to, by):
+    newGroup = GaussGroup()
+    newGroup.gaussList = list(map(lambda g: g.rationalized(to, by), self.gaussList))
+    return newGroup
+
+  def scale(self, by):
+    newGroup = GaussGroup()
+    newGroup.gaussList = self.gaussList[:]
+    for gauss in newGroup.gaussList:
+      gauss.coef = gauss.coef*by
+    return newGroup
+
+  def merge(self, otherGaussGroup):
+    newGroup = GaussGroup()
+    newGroup.gaussList = self.gaussList + otherGaussGroup.gaussList
+    return newGroup

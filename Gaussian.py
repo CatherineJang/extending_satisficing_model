@@ -26,7 +26,7 @@ class Gaussian:
       and returns resulting Gaussian
       (Does not modify original Gaussian)
     """
-    newCoef = self.coef / by
+    newCoef = self.coef * by
     newVar = self.var / by
     newMean = self.mean/by + (1-1/by)*to
     return Gaussian(newCoef, newVar, newMean)

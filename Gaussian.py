@@ -35,7 +35,7 @@ class Gaussian:
     """
       Returns the value of the integral from negative to positive infinity of the Gaussian
     """
-    return math.sqrt(2*math.pi)*self.var*self.coef
+    return math.sqrt(2*math.pi*self.var)*self.coef
 
 class GaussGroup:
   def __init__(self, startPop=False):

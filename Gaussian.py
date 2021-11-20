@@ -64,3 +64,9 @@ class GaussGroup:
     newGroup = GaussGroup()
     newGroup.gaussList = self.gaussList + otherGaussGroup.gaussList
     return newGroup
+  
+  def totalPopSize(self):
+    popSize = 0
+    for g in self.gaussList:
+      popSize += g.totalArea()
+    return popSize

@@ -1,24 +1,46 @@
-from Gaussian import Gaussian
+from Gaussian import Gaussian, GaussGroup
 
-def iteratePopulation(population, sigmaHat, rationalizationFactor):
+def main(sigmaHat, rationalizationFactor):
+  population = GaussGroup(startPop=True)
+  while True:
+    population = iteratePopulation(population, sigmaHat, rationalizationFactor)
+
+def iteratePopulation(population: GaussGroup, sigmaHat, rationalizationFactor):
   """
-    population is a list of gaussians that all add together 
+    population is a GaussGroup that adds together 
     (some of them might be negative) to make the population.
     Returns the new population
   """
 
   # Step 1 (lol)
-  popMean = 1 # we will need to actually find the maximizing popMean (method TBD)
+  partyMean = 1 # we will need to actually find the maximizing partyMean (method TBD)
 
   # Step 2
 
-  party1Satisfice = Gaussian(1, sigmaHat, popMean)
-  party2Satisfice = Gaussian(1, sigmaHat, -popMean)
-
+  # Gaussians for proportion of people at an ideology who are satisfied by each party and both
+  party1Satisfice = Gaussian(1, sigmaHat, partyMean)
+  party2Satisfice = Gaussian(1, sigmaHat, 0-partyMean)
   bothPartiesSatisfice = party1Satisfice.multiply(party2Satisfice)
 
-  party1Voters = []
+  # Potential voter group for each party (double counting doubly satisfied voters)
+  party1Voters = population.multiply(party1Satisfice)
+  party2Voters = population.multiply(party2Satisfice)
 
-  for popPart in population:
-    party1Voters.append(party1Satisfice.multiply(popPart))
+  # Remove half of doubly satisfied voters from each party
+  doubleCountedVoters = population.multiply(bothPartiesSatisfice).scale(-0.5)
+  party1Voters = party1Voters.merge(doubleCountedVoters)
+  party2Voters = party2Voters.merge(doubleCountedVoters)
 
+  # Step 3
+
+  party1VotersRationalized = party1Voters.rationalize(partyMean, rationalizationFactor)
+  party2VotersRationalized = party2Voters.rationalize(0-partyMean, rationalizationFactor)
+
+  # Step 4
+
+  oldVotersRemoved = party1Voters.scale(-1).merge(party2Voters.scale(-1))
+  newVotersAdded = party1VotersRationalized.merge(party2VotersRationalized)
+
+  newPop = population.merge(oldVotersRemoved).merge(newVotersAdded)
+
+  return newPop

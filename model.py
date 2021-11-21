@@ -28,8 +28,8 @@ def iteratePopulation(population: GaussGroup, sigmaHat, rationalizationFactor):
 
   # Remove half of doubly satisfied voters from each party
   doubleCountedVoters = population.multiply(bothPartiesSatisfice).scale(-0.5)
-  party1Voters = party1Voters.merge(doubleCountedVoters)
-  party2Voters = party2Voters.merge(doubleCountedVoters)
+  party1Voters = party1Voters.add(doubleCountedVoters)
+  party2Voters = party2Voters.add(doubleCountedVoters)
 
   # Step 3
 
@@ -38,9 +38,9 @@ def iteratePopulation(population: GaussGroup, sigmaHat, rationalizationFactor):
 
   # Step 4
 
-  oldVotersRemoved = party1Voters.scale(-1).merge(party2Voters.scale(-1))
-  newVotersAdded = party1VotersRationalized.merge(party2VotersRationalized)
+  oldVotersRemoved = party1Voters.scale(-1).add(party2Voters.scale(-1))
+  newVotersAdded = party1VotersRationalized.add(party2VotersRationalized)
 
-  newPop = population.merge(oldVotersRemoved).merge(newVotersAdded)
+  newPop = population.add(oldVotersRemoved).add(newVotersAdded)
 
   return newPop

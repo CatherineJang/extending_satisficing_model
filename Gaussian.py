@@ -60,7 +60,7 @@ class GaussGroup:
       gauss.coef = gauss.coef*by
     return newGroup
 
-  def merge(self, otherGaussGroup):
+  def add(self, otherGaussGroup):
     newGroup = GaussGroup()
     newGroup.gaussList = self.gaussList + otherGaussGroup.gaussList
     return newGroup

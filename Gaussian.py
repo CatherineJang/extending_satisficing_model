@@ -65,9 +65,8 @@ class GaussGroup:
 
   def scale(self, by):
     newGroup = GaussGroup()
-    newGroup.gaussList = self.gaussList[:]
-    for gauss in newGroup.gaussList:
-      gauss.coef = gauss.coef*by
+    for gauss in self.gaussList:
+      newGroup.gaussList.append(Gaussian(gauss.coef*by, gauss.var, gauss.mean))
     return newGroup
 
   def add(self, otherGaussGroup):

@@ -4,8 +4,8 @@ def main(sigmaHat, rationalizationFactor):
   population = GaussGroup(startPop=True)
   partyMeanInitialGuess = 1
   for i in range(5):
-    population, partyMeanInitialGuess = iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess)
-    print(partyMeanInitialGuess)
+    population, partyMeanInitialGuess, totalVoters = iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess)
+    print(partyMeanInitialGuess, totalVoters, population.totalPopSize(), '\n')
 
 def iteratePopulation(population: GaussGroup, sigmaHat, rationalizationFactor, partyMeanInitialGuess):
   """
@@ -17,17 +17,17 @@ def iteratePopulation(population: GaussGroup, sigmaHat, rationalizationFactor, p
   # Step 1 using secant method
   partyMean = partyMeanInitialGuess
   epsilon = 0.01
-  lastPartyMean = partyMeanInitialGuess + 2*epsilon
+  lastPartyMean1 = partyMeanInitialGuess + 2*epsilon
+  lastPartyMean = lastPartyMean1
   dVoteTotalPrev = population.totalAreaDPartyMean(lastPartyMean, sigmaHat)
 
   while abs(partyMean-lastPartyMean)>epsilon:
-    lastPartyMean = partyMean
+    lastPartyMean1 = partyMean
     dVoteTotal = population.totalAreaDPartyMean(partyMean, sigmaHat)
-    print(dVoteTotal, dVoteTotalPrev)
 
     partyMean = partyMean - dVoteTotal*(partyMean-lastPartyMean)/(dVoteTotal-dVoteTotalPrev)
+    lastPartyMean = lastPartyMean1
 
-    lastPartyMean = partyMean
     dVoteTotalPrev = dVoteTotal
 
   # Step 2
@@ -58,6 +58,6 @@ def iteratePopulation(population: GaussGroup, sigmaHat, rationalizationFactor, p
 
   newPop = population.add(oldVotersRemoved).add(newVotersAdded)
 
-  return newPop, partyMean
+  return newPop, partyMean, party1Voters.totalPopSize()
 
-main(0.5, 1.01)
+main(0.5, 1)

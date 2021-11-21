@@ -15,7 +15,7 @@ class Gaussian:
       Takes Gaussian to multiply by and returns product Gaussian
       (Does not modify original Gaussian)
     """
-    newCoef = self.coef * otherGaussian.coef * (math.exp(-0.5*(self.mean-otherGaussian.mean)^2/(self.var+otherGaussian.var)))
+    newCoef = self.coef * otherGaussian.coef * (math.exp(-0.5*(self.mean-otherGaussian.mean)**2/(self.var+otherGaussian.var)))
     newVar = self.var * otherGaussian.var / (self.var + otherGaussian.var)
     newMean = (self.mean*otherGaussian.var + otherGaussian.mean*self.var)/(otherGaussian.var + self.var)
     return Gaussian(newCoef, newVar, newMean)
@@ -36,6 +36,16 @@ class Gaussian:
       Returns the value of the integral from negative to positive infinity of the Gaussian
     """
     return math.sqrt(2*math.pi*self.var)*self.coef
+
+  def totalAreaDPartyMean(self, partyMean, sigmaHat):
+
+    partySatisfiedVotersDCoef = self.coef*(self.var*sigmaHat)**(1/2)*(self.mean-partyMean)/(self.var+sigmaHat)**(3/2)
+    partySatisfiedVotersDExp = 0-(self.mean-partyMean)**2/(self.var+sigmaHat)/2
+
+    bothSatisfiedVotersDCoef = partyMean/((2*self.var)**(1/2)*sigmaHat+sigmaHat**(3/2))
+    bothSatisfiedVotersDExp = 2*self.mean**2/(2*self.var+sigmaHat)-partyMean**2/sigmaHat
+
+    return partySatisfiedVotersDCoef*math.exp(partySatisfiedVotersDExp)+bothSatisfiedVotersDCoef*math.exp(bothSatisfiedVotersDExp)
 
 class GaussGroup:
   def __init__(self, startPop=False):
@@ -70,3 +80,9 @@ class GaussGroup:
     for g in self.gaussList:
       popSize += g.totalArea()
     return popSize
+
+  def totalAreaDPartyMean(self, partyMean, sigmaHat):
+    dPopSize = 0
+    for g in self.gaussList:
+      dPopSize += g.totalAreaDPartyMean(partyMean, sigmaHat)
+    return dPopSize

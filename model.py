@@ -2,18 +2,33 @@ from Gaussian import Gaussian, GaussGroup
 
 def main(sigmaHat, rationalizationFactor):
   population = GaussGroup(startPop=True)
-  while True:
-    population = iteratePopulation(population, sigmaHat, rationalizationFactor)
+  partyMeanInitialGuess = 1
+  for i in range(5):
+    population, partyMeanInitialGuess = iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess)
+    print(partyMeanInitialGuess)
 
-def iteratePopulation(population: GaussGroup, sigmaHat, rationalizationFactor):
+def iteratePopulation(population: GaussGroup, sigmaHat, rationalizationFactor, partyMeanInitialGuess):
   """
     population is a GaussGroup that adds together 
     (some of them might be negative) to make the population.
     Returns the new population
   """
 
-  # Step 1 (lol)
-  partyMean = 1 # we will need to actually find the maximizing partyMean (method TBD)
+  # Step 1 using secant method
+  partyMean = partyMeanInitialGuess
+  epsilon = 0.01
+  lastPartyMean = partyMeanInitialGuess + 2*epsilon
+  dVoteTotalPrev = population.totalAreaDPartyMean(lastPartyMean, sigmaHat)
+
+  while abs(partyMean-lastPartyMean)>epsilon:
+    lastPartyMean = partyMean
+    dVoteTotal = population.totalAreaDPartyMean(partyMean, sigmaHat)
+    print(dVoteTotal, dVoteTotalPrev)
+
+    partyMean = partyMean - dVoteTotal*(partyMean-lastPartyMean)/(dVoteTotal-dVoteTotalPrev)
+
+    lastPartyMean = partyMean
+    dVoteTotalPrev = dVoteTotal
 
   # Step 2
 
@@ -43,4 +58,6 @@ def iteratePopulation(population: GaussGroup, sigmaHat, rationalizationFactor):
 
   newPop = population.add(oldVotersRemoved).add(newVotersAdded)
 
-  return newPop
+  return newPop, partyMean
+
+main(0.5, 1.01)

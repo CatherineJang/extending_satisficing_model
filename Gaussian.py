@@ -26,7 +26,7 @@ class Gaussian:
       and returns resulting Gaussian
       (Does not modify original Gaussian)
     """
-    newCoef = self.coef * by
+    newCoef = self.coef * math.sqrt(by)
     newVar = self.var / by
     newMean = self.mean/by + (1-1/by)*to
     return Gaussian(newCoef, newVar, newMean)
@@ -79,6 +79,34 @@ class GaussGroup:
     for g in self.gaussList:
       popSize += g.totalArea()
     return popSize
+
+  def totalAreaSecPartyMean(self, partyMean, sigmaHat, epsilon):
+    # Gaussians for proportion of people at an ideology who are satisfied by each party and both
+    party1Satisfice = Gaussian(1, sigmaHat, partyMean)
+    party2Satisfice = Gaussian(1, sigmaHat, 0-partyMean)
+    bothPartiesSatisfice = party1Satisfice.multiply(party2Satisfice)
+    # Potential voter group for each party (double counting doubly satisfied voters)
+    party1Voters = self.multiply(party1Satisfice)
+    party2Voters = self.multiply(party2Satisfice)
+    # Remove half of doubly satisfied voters from each party
+    doubleCountedVoters = self.multiply(bothPartiesSatisfice).scale(-0.5)
+    party1Voters = party1Voters.add(doubleCountedVoters)
+    party2Voters = party2Voters.add(doubleCountedVoters)
+
+    voteTotal1 = party1Voters.totalPopSize()
+
+    party1Satisfice = Gaussian(1, sigmaHat, partyMean+epsilon)
+    party2Satisfice = Gaussian(1, sigmaHat, 0-partyMean-epsilon)
+    bothPartiesSatisfice = party1Satisfice.multiply(party2Satisfice)
+    # Potential voter group for each party (double counting doubly satisfied voters)
+    party1Voters = self.multiply(party1Satisfice)
+    party2Voters = self.multiply(party2Satisfice)
+    # Remove half of doubly satisfied voters from each party
+    doubleCountedVoters = self.multiply(bothPartiesSatisfice).scale(-0.5)
+    party1Voters = party1Voters.add(doubleCountedVoters)
+    party2Voters = party2Voters.add(doubleCountedVoters)
+
+    return party1Voters.totalPopSize() - voteTotal1
 
   def totalAreaDPartyMean(self, partyMean, sigmaHat):
     dPopSize = 0

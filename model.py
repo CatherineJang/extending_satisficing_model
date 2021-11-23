@@ -1,18 +1,32 @@
 from Gaussian import Gaussian, GaussGroup
 import math
+import matplotlib.pyplot as plt
+import numpy as np
 
-def main(sigmaHat, rationalizationFactor):
+def main(sigmaHat, rationalizationFactor, doPlot = False, iterations = 3):
   population = GaussGroup(startPop=True)
   partyMeanInitialGuess = 1
-  for i in range(6):
-    population, partyMeanInitialGuess, totalVoters = iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess)
-    if i==0:
-      print(partyMeanInitialGuess, totalVoters)
-  return partyMeanInitialGuess, totalVoters
+  if doPlot:
+    graph(population.eval, range(0, 1510, 10), 1, False)
+  for i in range(1,iterations+1):
+    population, partyMeanInitialGuess, voters1 = iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess)
+    partyMean = int(1000*partyMeanInitialGuess)
+    if doPlot:
+      graph(population.eval, range(0, 1510, 10), 1-1*i/iterations, False)
+      # graph(voters1.eval, range(0, 1510, 10), 1-1*i/iterations, True)
+      plt.plot([partyMean, partyMean], [0,0.5], color=(0, 1-1*(i-1)/iterations, 1), linewidth=1)
+    print(partyMeanInitialGuess)
+  if doPlot:
+    plt.show()
 
 gr = (math.sqrt(5) + 1) / 2
 
-def gss(f, a, b, tol=1e-5):
+def graph(formula, x_range, hue, b):  
+    x = np.array(x_range)  
+    y = np.array(list(map(formula, list(x_range))))
+    plt.plot(x, y, color=(int(b), hue, int(not b)), linewidth=1)
+
+def gss(f, a, b, tol=1e-2):
     """Golden-section search
     to find the minimum of f on [a,b]
     f: a strictly unimodal function on [a,b]
@@ -61,6 +75,10 @@ def iteratePopulation(population: GaussGroup, sigmaHat, rationalizationFactor, p
     party2Voters = party2Voters.add(doubleCountedVoters)
     return 0-party1Voters.totalPopSize()
   partyMean = gss(fToMinimize, 0, partyMeanInitialGuess*2)
+  # uncomment to plot total votes at each ideology
+  # graph(lambda x: 0-fToMinimize(x/1000), range(0, 1510, 10), 0, False)
+  # plt.plot([partyMean*1000, partyMean*1000], [0,0.5], color=(0, 1, 1), linewidth=1)
+  # plt.show()
 
   # Step 1 using secant method
   # epsilon = 0.01
@@ -108,8 +126,6 @@ def iteratePopulation(population: GaussGroup, sigmaHat, rationalizationFactor, p
 
   newPop = population.add(oldVotersRemoved).add(newVotersAdded)
 
-  return newPop, partyMean, party1Voters.totalPopSize()
+  return newPop, partyMean, party1Voters
 
-for i in range(10):
-  print(i, '\n')
-  print(main(i/10+0.001, 2))
+main(0.4,1.2, doPlot=True, iterations=7)

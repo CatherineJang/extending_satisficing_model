@@ -16,6 +16,8 @@ def main(sigmaHat, rationalizationFactor, doPlot = False, doVoters = False, iter
       if doVoters:
         graph(voters1.eval, range(0, 1510, 10), 1-1*i/iterations, True)
       plt.plot([partyMean, partyMean], [0,0.5], color=(0, 1-1*(i-1)/iterations, 1), linewidth=1)
+      plt.xlabel("Population")
+      plt.ylabel("Ideology")
     print(partyMeanInitialGuess)
   if doPlot:
     plt.show()

@@ -3,7 +3,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 
-def main(sigmaHat, rationalizationFactor, doPlot = False, iterations = 3):
+def main(sigmaHat, rationalizationFactor, doPlot = False, doVoters = False, iterations = 3):
   population = GaussGroup(startPop=True)
   partyMeanInitialGuess = 1
   if doPlot:
@@ -13,7 +13,8 @@ def main(sigmaHat, rationalizationFactor, doPlot = False, iterations = 3):
     partyMean = int(1000*partyMeanInitialGuess)
     if doPlot:
       graph(population.eval, range(0, 1510, 10), 1-1*i/iterations, False)
-      # graph(voters1.eval, range(0, 1510, 10), 1-1*i/iterations, True)
+      if doVoters:
+        graph(voters1.eval, range(0, 1510, 10), 1-1*i/iterations, True)
       plt.plot([partyMean, partyMean], [0,0.5], color=(0, 1-1*(i-1)/iterations, 1), linewidth=1)
     print(partyMeanInitialGuess)
   if doPlot:
@@ -128,4 +129,4 @@ def iteratePopulation(population: GaussGroup, sigmaHat, rationalizationFactor, p
 
   return newPop, partyMean, party1Voters
 
-main(0.4,1.2, doPlot=True, iterations=7)
+main(0.4,1.2, doPlot=True, doVoters=False, iterations=5)

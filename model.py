@@ -2,24 +2,25 @@ from Gaussian import Gaussian, GaussGroup
 import math
 import matplotlib.pyplot as plt
 import numpy as np
+import argparse
 
-def main(sigmaHat, rationalizationFactor, doPlot = False, doVoters = False, iterations = 3):
+def main(args):
   population = GaussGroup(startPop=True)
   partyMeanInitialGuess = 1
-  if doPlot:
+  if args.doPlot:
     graph(population.eval, range(0, 1510, 10), 1, False)
-  for i in range(1,iterations+1):
-    population, partyMeanInitialGuess, voters1 = iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess)
+  for i in range(1,args.iterations+1):
+    population, partyMeanInitialGuess, voters1 = iteratePopulation(population, args.sigmaHat, args.rationalizationFactor, partyMeanInitialGuess)
     partyMean = int(1000*partyMeanInitialGuess)
-    if doPlot:
-      graph(population.eval, range(0, 1510, 10), 1-1*i/iterations, False)
-      if doVoters:
-        graph(voters1.eval, range(0, 1510, 10), 1-1*i/iterations, True)
-      plt.plot([partyMean, partyMean], [0,0.5], color=(0, 1-1*(i-1)/iterations, 1), linewidth=1)
+    if args.doPlot:
+      graph(population.eval, range(0, 1510, 10), 1-1*i/args.iterations, False)
+      if args.doVoters:
+        graph(voters1.eval, range(0, 1510, 10), 1-1*i/args.iterations, True)
+      plt.plot([partyMean, partyMean], [0,0.5], color=(0, 1-1*(i-1)/args.iterations, 1), linewidth=1)
       plt.xlabel("Population")
       plt.ylabel("Ideology")
     print(partyMeanInitialGuess)
-  if doPlot:
+  if args.doPlot:
     plt.show()
 
 gr = (math.sqrt(5) + 1) / 2
@@ -131,4 +132,13 @@ def iteratePopulation(population: GaussGroup, sigmaHat, rationalizationFactor, p
 
   return newPop, partyMean, party1Voters
 
-main(0.4,1.2, doPlot=True, doVoters=False, iterations=5)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("sigmaHat", help = "sigmaHat", type=float)
+    parser.add_argument("rationalizationFactor", help = "rationalization factor", type=float)
+    parser.add_argument("iterations", help="Number of iterations.", type=int)
+    parser.add_argument("--doPlot", "-p", help="Name of file to write plot to.", action="store_true")
+    parser.add_argument("--doVoters", "-v", help="Plot voter curves.",action="store_true")
+    args = parser.parse_args()
+    main(args)

@@ -5,23 +5,29 @@ import numpy as np
 import argparse
 
 def main(args):
+  runModel(args.sigmaHat, args.rationalizationFactor, args.doPlot, args.doVoters, args.iterations)
+
+def runModel(sigmaHat, rationalizationFactor, doPlot=False, doVoters=False, iterations=5):
   population = GaussGroup(startPop=True)
   partyMeanInitialGuess = 1
-  if args.doPlot:
+  partyMeansVec = []
+  if doPlot:
     graph(population.eval, range(0, 1510, 10), 1, False)
-  for i in range(1,args.iterations+1):
-    population, partyMeanInitialGuess, voters1 = iteratePopulation(population, args.sigmaHat, args.rationalizationFactor, partyMeanInitialGuess)
+  for i in range(1,iterations+1):
+    population, partyMeanInitialGuess, voters1 = iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess)
     partyMean = int(1000*partyMeanInitialGuess)
-    if args.doPlot:
-      graph(population.eval, range(0, 1510, 10), 1-1*i/args.iterations, False)
-      if args.doVoters:
-        graph(voters1.eval, range(0, 1510, 10), 1-1*i/args.iterations, True)
-      plt.plot([partyMean, partyMean], [0,0.5], color=(0, 1-1*(i-1)/args.iterations, 1), linewidth=1)
+    if doPlot:
+      graph(population.eval, range(0, 1510, 10), 1-1*i/iterations, False)
+      if doVoters:
+        graph(voters1.eval, range(0, 1510, 10), 1-1*i/iterations, True)
+      plt.plot([partyMean, partyMean], [0,0.5], color=(0, 1-1*(i-1)/iterations, 1), linewidth=1)
       plt.xlabel("Population")
       plt.ylabel("Ideology")
-    print(partyMeanInitialGuess)
-  if args.doPlot:
+    # Collect means 
+    partyMeansVec.append(partyMeanInitialGuess)
+  if doPlot:
     plt.show()
+  return partyMeansVec
 
 gr = (math.sqrt(5) + 1) / 2
 

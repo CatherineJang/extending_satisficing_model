@@ -3,27 +3,38 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 
-def main(sigmaHat, rationalizationFactor, doPlot = False, iterations = 3):
+def main(sigmaHat, rationalizationFactor, doPlot = False, iterations = 7, csvWrite=None, definition=1):
   population = GaussGroup(startPop=True)
   partyMeanInitialGuess = 1
   if doPlot:
-    graph(population.eval, range(0, 1510, 10), 1, False)
+    graph(population.eval, list(range(-200, 0, definition)), 1, False)
+  if csvWrite:
+    csvWrite.write('\n')
   for i in range(1,iterations+1):
+    if i>5:
+      definition*=2
     population, partyMeanInitialGuess, voters1 = iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess)
-    partyMean = int(1000*partyMeanInitialGuess)
+    partyMean = int(100*partyMeanInitialGuess)
     if doPlot:
-      graph(population.eval, range(0, 1510, 10), 1-1*i/iterations, False)
-      # graph(voters1.eval, range(0, 1510, 10), 1-1*i/iterations, True)
+      HDCutoff = int(max(-200, 0-1.5*partyMean))
+      x = list(range(-200, HDCutoff, definition*3)) + list(range(HDCutoff, 0+definition, definition))
+      graph(population.eval, x, 1-1*i/iterations, False)
+      graph(voters1.eval, x, 1-1*i/iterations, True)
+      graph(voters1.eval, list(map(lambda a: 0-a, x)), 1-1*i/iterations, True)
       plt.plot([partyMean, partyMean], [0,0.5], color=(0, 1-1*(i-1)/iterations, 1), linewidth=1)
-    print(partyMeanInitialGuess)
+    if csvWrite:
+      csvWrite.write(', {}'.format(partyMeanInitialGuess))
+    else:
+      print(i, partyMeanInitialGuess, voters1.totalPopSize())
   if doPlot:
     plt.show()
 
 gr = (math.sqrt(5) + 1) / 2
 
-def graph(formula, x_range, hue, b):  
-    x = np.array(x_range)  
-    y = np.array(list(map(formula, list(x_range))))
+def graph(formula, x, hue, b):
+    y = list(map(lambda x: formula(x/100), x))
+    x = x + list(map(lambda a: 0-a, x[-2::-1]))
+    y = y + y[-2::-1]
     plt.plot(x, y, color=(int(b), hue, int(not b)), linewidth=1)
 
 def gss(f, a, b, tol=1e-2):
@@ -75,7 +86,7 @@ def iteratePopulation(population: GaussGroup, sigmaHat, rationalizationFactor, p
     party2Voters = party2Voters.add(doubleCountedVoters)
     return 0-party1Voters.totalPopSize()
   partyMean = gss(fToMinimize, 0, partyMeanInitialGuess*2)
-  # uncomment to plot total votes at each ideology
+  # # uncomment to plot total votes at each ideology
   # graph(lambda x: 0-fToMinimize(x/1000), range(0, 1510, 10), 0, False)
   # plt.plot([partyMean*1000, partyMean*1000], [0,0.5], color=(0, 1, 1), linewidth=1)
   # plt.show()
@@ -128,4 +139,4 @@ def iteratePopulation(population: GaussGroup, sigmaHat, rationalizationFactor, p
 
   return newPop, partyMean, party1Voters
 
-main(0.4,1.2, doPlot=True, iterations=7)
+main(0.8, 1.5, doPlot=True, definition=2)

@@ -86,7 +86,7 @@ class GaussGroup:
   def eval(self, x):
     val = 0
     for g in self.gaussList:
-      val += g.eval(x/1000)
+      val += g.eval(x)
     return val
 
   # def totalAreaSecPartyMean(self, partyMean, sigmaHat, epsilon):

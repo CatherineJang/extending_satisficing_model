@@ -2,10 +2,15 @@ from Gaussian import Gaussian, GaussGroup
 import math
 import matplotlib.pyplot as plt
 import numpy as np
+import argparse
 
-def main(sigmaHat, rationalizationFactor, doPlot = False, iterations = 7, csvWrite=None, definition=1):
+def main(args):
+  runModel(args.sigmaHat, args.rationalizationFactor, args.doPlot, args.doVoters, args.iterations)
+
+def runModel(sigmaHat, rationalizationFactor, doPlot=False, doVoters=False, iterations=5, doPartyMean=False, csvWrite=None, definition=1):
   population = GaussGroup(startPop=True)
   partyMeanInitialGuess = 1
+  partyMeansVec = []
   if doPlot:
     graph(population.eval, list(range(-200, 0, definition)), 1, False)
   if csvWrite:
@@ -19,15 +24,22 @@ def main(sigmaHat, rationalizationFactor, doPlot = False, iterations = 7, csvWri
       HDCutoff = int(max(-200, 0-1.5*partyMean))
       x = list(range(-200, HDCutoff, definition*3)) + list(range(HDCutoff, 0+definition, definition))
       graph(population.eval, x, 1-1*i/iterations, False)
-      graph(voters1.eval, x, 1-1*i/iterations, True)
-      graph(voters1.eval, list(map(lambda a: 0-a, x)), 1-1*i/iterations, True)
-      plt.plot([partyMean, partyMean], [0,0.5], color=(0, 1-1*(i-1)/iterations, 1), linewidth=1)
+      if doVoters:
+        graph(voters1.eval, x, 1-1*i/iterations, True)
+        graph(voters1.eval, list(map(lambda a: 0-a, x)), 1-1*i/iterations, True)
+      if doPartyMean:
+        plt.plot([partyMean, partyMean], [0,0.5], color=(0, 1-1*(i-1)/iterations, 1), linewidth=1)
+      plt.xlabel("Population")
+      plt.ylabel("Ideology")
+    # Collect means 
+    partyMeansVec.append(partyMeanInitialGuess)
     if csvWrite:
       csvWrite.write(', {}'.format(partyMeanInitialGuess))
     else:
       print(i, partyMeanInitialGuess, voters1.totalPopSize())
   if doPlot:
     plt.show()
+  return partyMeansVec
 
 gr = (math.sqrt(5) + 1) / 2
 
@@ -139,4 +151,13 @@ def iteratePopulation(population: GaussGroup, sigmaHat, rationalizationFactor, p
 
   return newPop, partyMean, party1Voters
 
-main(0.8, 1.5, doPlot=True, definition=2)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("sigmaHat", help = "sigmaHat", type=float)
+    parser.add_argument("rationalizationFactor", help = "rationalization factor", type=float)
+    parser.add_argument("iterations", help="Number of iterations.", type=int)
+    parser.add_argument("--doPlot", "-p", help="Name of file to write plot to.", action="store_true")
+    parser.add_argument("--doVoters", "-v", help="Plot voter curves.", action="store_true")
+    args = parser.parse_args()
+    main(args)

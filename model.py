@@ -35,8 +35,8 @@ def runModel(sigmaHat, rationalizationFactor, doPlot=False, doVoters=False, iter
     partyMeansVec.append(partyMeanInitialGuess)
     if csvWrite:
       csvWrite.write(', {}'.format(partyMeanInitialGuess))
-    else:
-      print(i, partyMeanInitialGuess, voters1.totalPopSize())
+    # else:
+    #   print(i, partyMeanInitialGuess, voters1.totalPopSize())
   if doPlot:
     plt.show()
   return partyMeansVec
@@ -49,7 +49,7 @@ def graph(formula, x, hue, b):
     y = y + y[-2::-1]
     plt.plot(x, y, color=(int(b), hue, int(not b)), linewidth=1)
 
-def gss(f, a, b, tol=1e-2):
+def gss(f, a, b, tol=1e-3):
     """Golden-section search
     to find the minimum of f on [a,b]
     f: a strictly unimodal function on [a,b]

@@ -7,10 +7,10 @@ import argparse
 def main(args):
   runModel(args.sigmaHat, args.rationalizationFactor, args.doPlot, args.doVoters, args.iterations)
 
-def runModel(sigmaHat, rationalizationFactor, doPlot=False, doVoters=False, iterations=5, doPartyMean=False, csvWrite=None, definition=1):
+def runModel(sigmaHat, rationalizationFactor, doPlot=False, doVoters=False, iterations=5, doPartyMean=False, csvWrite=None, definition=1, retVal="NONE"):
   population = GaussGroup(startPop=True)
   partyMeanInitialGuess = 1
-  partyMeansVec = []
+  returnVec = []
   if doPlot:
     graph(population.eval, list(range(-200, 0, definition)), 1, False)
   if csvWrite:
@@ -31,15 +31,21 @@ def runModel(sigmaHat, rationalizationFactor, doPlot=False, doVoters=False, iter
         plt.plot([partyMean, partyMean], [0,0.5], color=(0, 1-1*(i-1)/iterations, 1), linewidth=1)
       plt.xlabel("Population")
       plt.ylabel("Ideology")
-    # Collect means 
-    partyMeansVec.append(partyMeanInitialGuess)
+    
+    # Collect means
+    if retVal=="P-MEAN":
+      returnVec.append(partyMeanInitialGuess)
+    if retVal=="THIRDS":
+      moderates = population.area(0,0.43)*2
+      establishment = population.area(0.43,0.97)*2
+      returnVec.append((1-moderates-establishment,establishment,moderates))
     if csvWrite:
       csvWrite.write(', {}'.format(partyMeanInitialGuess))
     # else:
     #   print(i, partyMeanInitialGuess, voters1.totalPopSize())
   if doPlot:
     plt.show()
-  return partyMeansVec
+  return returnVec
 
 gr = (math.sqrt(5) + 1) / 2
 

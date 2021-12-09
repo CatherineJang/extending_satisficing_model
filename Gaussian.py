@@ -88,6 +88,20 @@ class GaussGroup:
     for g in self.gaussList:
       val += g.eval(x)
     return val
+  
+  def area(self, start, stop, res=0.01):
+    tot = 0
+    cur=start
+    lastVal = None
+    while cur<stop:
+      a = self.eval(cur)
+      if lastVal:
+        tot+=res*(lastVal+self.eval(cur))/2
+      lastVal = a
+      cur+=res
+    return tot
+      
+
 
   # def totalAreaSecPartyMean(self, partyMean, sigmaHat, epsilon):
   #   # Gaussians for proportion of people at an ideology who are satisfied by each party and both

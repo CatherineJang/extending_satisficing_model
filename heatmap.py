@@ -13,7 +13,7 @@ defaultSigmaHRange = [x/20.0 for x in range(1, 41, 1)]
 defaultrfRange = [x/10.0 for x in range(10, 25, 1)]
 
 heatOf = "P-MEAN"
-iterations = 6
+iterations = 5
 
 theme = sns.diverging_palette(260, 20, s=100, as_cmap=True)
 thirdsNames = ["EXTREME", "ESTABLISHMENT", "MODERATES"]

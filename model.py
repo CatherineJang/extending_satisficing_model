@@ -45,6 +45,8 @@ def runModel(sigmaHat, rationalizationFactor, doPlot=False, doVoters=False, iter
     #   print(i, partyMeanInitialGuess, voters1.totalPopSize())
   if doPlot:
     plt.show()
+  if retVal=="P-MEAN":
+    returnVec.append(iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess, breakEarly=True))
   return returnVec
 
 gr = (math.sqrt(5) + 1) / 2
@@ -81,7 +83,7 @@ def gss(f, a, b, tol=1e-3):
 
     return (b + a) / 2
 
-def iteratePopulation(population: GaussGroup, sigmaHat, rationalizationFactor, partyMeanInitialGuess):
+def iteratePopulation(population: GaussGroup, sigmaHat, rationalizationFactor, partyMeanInitialGuess, breakEarly=False):
   """
     population is a GaussGroup that adds together 
     (some of them might be negative) to make the population.
@@ -104,6 +106,8 @@ def iteratePopulation(population: GaussGroup, sigmaHat, rationalizationFactor, p
     party2Voters = party2Voters.add(doubleCountedVoters)
     return 0-party1Voters.totalPopSize()
   partyMean = gss(fToMinimize, 0, partyMeanInitialGuess*2)
+  if breakEarly:
+    return partyMean
   # # uncomment to plot total votes at each ideology
   # graph(lambda x: 0-fToMinimize(x/1000), range(0, 1510, 10), 0, False)
   # plt.plot([partyMean*1000, partyMean*1000], [0,0.5], color=(0, 1, 1), linewidth=1)

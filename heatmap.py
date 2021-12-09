@@ -27,7 +27,7 @@ def main():
     plt.clf()
 
 def makeDFs(of, sigmaHRange=defaultSigmaHRange, rfRange=defaultrfRange, iterations=3, P=True):
-  allPartyMeanShiftsAllIter = [[[] for x in sigmaHRange] for y in range(iterations-1)]
+  allPartyMeanShiftsAllIter = [[[] for x in sigmaHRange] for y in range(iterations)]
 
   extremeAllIter = [[[] for x in sigmaHRange] for y in range(iterations)]
   establishmentAllIter = [[[] for x in sigmaHRange] for y in range(iterations)]
@@ -39,7 +39,7 @@ def makeDFs(of, sigmaHRange=defaultSigmaHRange, rfRange=defaultrfRange, iteratio
       results2D = Parallel(n_jobs=-1)(delayed(model.runModel)(sigmaHRange[i], j, iterations=iterations, retVal=of) for j in rfRange)
       if of=="P-MEAN":
         for partyMeans in results2D:
-          for iterCount in range(1, iterations):
+          for iterCount in range(1, iterations+1):
             partyMeanShift = partyMeans[iterCount] - partyMeans[0]
             allPartyMeanShiftsAllIter[iterCount-1][i].append(partyMeanShift)
       if of=="THIRDS":

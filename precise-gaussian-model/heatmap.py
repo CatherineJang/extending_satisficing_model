@@ -23,7 +23,7 @@ def main():
     sns.heatmap(DF, center=0 if heatOf=="P-MEAN" else 0.33, cmap=theme, vmin=0.1 if heatOf=="THIRDS" else None, vmax=0.6 if heatOf=="THIRDS" else None)
     plt.xlabel("rationalization factor")
     plt.ylabel("sigma_h")
-    plt.savefig('figs/Heatmaps/{}-{}-iter-Heat.png'.format(thirdsNames[i//iterations] if heatOf=="THIRDS" else heatOf, i%iterations+2))
+    plt.savefig('../figs/Heatmaps/{}-{}-iter-Heat.png'.format(thirdsNames[i//iterations] if heatOf=="THIRDS" else heatOf, i%iterations+2))
     plt.clf()
 
 def makeDFs(of, sigmaHRange=defaultSigmaHRange, rfRange=defaultrfRange, iterations=3, P=True):

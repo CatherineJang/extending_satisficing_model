@@ -4,21 +4,29 @@ import numpy as np
 import argparse
 
 def main(args):
-  runModel(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.doVoters, args.iterations)
+  for i in range(args.numSimulations):
+    runModel(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.doVoters, args.iterations, args.symmetrical, args.numSimulations)
+  plt.show()
 
-def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=False, iterations=10):
+def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=False, iterations=10, symmetrical=False, numSimulations=1):
   population = np.random.normal(loc=0, scale=1, size = numVoters)
+  if symmetrical:
+    population = np.absolute(population)
   partyMeanInitialGuess = 1
-  if doPlot:
-    plt.hist(population,list(map(lambda x: (x-25)/10, range(50))),color=(0.0,0,1,0.1/iterations))
-  print(population)
+  if doPlot and numSimulations==1:
+    plt.hist(population,list(map(lambda x: x/66, range(100))),color=(0.0,0,1,0.01))
+  x=[]
   for i in range(1,iterations+1):
-    population = iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess)
-    if doPlot:
-      plt.hist(population,list(map(lambda x: (x-25)/10, range(50))),color=(0.0,i/iterations,(1-i/iterations),(0.1+i/10)/iterations))
+    population, partyMeanInitialGuess = iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess, symmetrical)
+    x.append(partyMeanInitialGuess)
+    if symmetrical:
+      population = np.absolute(population)
+    if doPlot and numSimulations==1:
+      plt.hist(population,list(map(lambda x: x/66, range(100))),color=(0.0,i/iterations,(1-i/iterations),(iterations/100+i/20)/iterations))
   if doPlot:
-    plt.show()
-  print(population)
+    if numSimulations==1:
+      plt.show()
+    plt.plot(x)
 
 gr = (math.sqrt(5) + 1) / 2
 
@@ -54,7 +62,7 @@ def gss(f, a, b, tol=1e-3):
 
     return (b + a) / 2
 
-def iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess):
+def iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess, symmetrical):
   """
     population is a vector of ideologies of people in the population.
     Returns the new population
@@ -62,6 +70,14 @@ def iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInit
 
   # TODO: Step 1
   partyMean = partyMeanInitialGuess
+  if symmetrical:
+    def fToMinimize(partyMean):
+      # Gaussians for proportion of people at an ideology who are satisfied by each party and both
+      party1SatisficeProbs = np.array(list(map(lambda x: math.exp(0-(x-partyMean)**2/sigmaHat/2), population)))
+      party2SatisficeProbs = np.array(list(map(lambda x: math.exp(0-(x+partyMean)**2/sigmaHat/2), population)))
+      bothPartiesSatisfice = party1SatisficeProbs * party2SatisficeProbs
+      return 0 - np.sum(party1SatisficeProbs) - np.sum(party2SatisficeProbs) + np.sum(bothPartiesSatisfice)
+    partyMean = gss(fToMinimize, 0, partyMeanInitialGuess*2)
 
   # Step 2
 
@@ -92,9 +108,8 @@ def iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInit
     if party2Voters[i]:
       population[i] += ((rationalizationFactor-1)/rationalizationFactor)*(0-partyMean - population[i])
       votes[1]+=1
-  print(votes)
 
-  return population
+  return population, partyMean
 
 
 if __name__ == "__main__":

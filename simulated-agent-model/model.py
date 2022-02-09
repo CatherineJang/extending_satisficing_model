@@ -13,7 +13,9 @@ def main(args):
       plt.show()
   else:
     for i in range(args.numSimulations):
-      runModel(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.doVoters, args.iterations, args.symmetrical, args.numSimulations)
+      x = runModel(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.doVoters, args.iterations, args.symmetrical, args.numSimulations)
+      if args.doPlot:
+        plt.plot(x)
   plt.show()
 
 def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=False, iterations=10, symmetrical=False, numSimulations=1):
@@ -24,9 +26,11 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=
   if doPlot and numSimulations==1:
     plt.hist(population,list(map(lambda x: x/66, range(100))),color=(0.0,0,1,0.01))
   x=[]
+  x2=[]
   for i in range(1,iterations+1):
     population, partyMeanInitialGuess = iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess, symmetrical)
     x.append(partyMeanInitialGuess)
+    x2.append(np.mean(population))
     if symmetrical:
       population = np.absolute(population)
     if doPlot and numSimulations==1:
@@ -34,6 +38,7 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=
   if doPlot:
     if numSimulations==1:
       plt.show()
+      plt.plot(x2)
   return x
 
 gr = (math.sqrt(5) + 1) / 2

@@ -130,6 +130,6 @@ if __name__ == "__main__":
     parser.add_argument("--doPlot", "-p", help="Name of file to write plot to.", action="store_true")
     parser.add_argument("--doVoters", "-v", help="Plot voter curves.", action="store_true")
     parser.add_argument("--symmetrical", "-s", help="Constrain voter ideologies to be symetrical.", action="store_true")
-    parser.add_argument("--parallell", "-l", help="Parallellize running of the simulation.", action="store_true")
+    parser.add_argument("--parallell", "-l", help="Parallellize running of the simulation (will be fast, and your computer will heat up).", action="store_true")
     args = parser.parse_args()
     main(args)

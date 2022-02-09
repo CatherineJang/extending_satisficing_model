@@ -2,10 +2,18 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
+from joblib import Parallel, delayed
 
 def main(args):
-  for i in range(args.numSimulations):
-    runModel(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.doVoters, args.iterations, args.symmetrical, args.numSimulations)
+  if args.parallell:
+    results = Parallel(n_jobs=-1)(delayed(runModel)(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.doVoters, args.iterations, args.symmetrical, args.numSimulations) for i in range(args.numSimulations))
+    if args.doPlot:
+      for x in results:
+        plt.plot(x)
+      plt.show()
+  else:
+    for i in range(args.numSimulations):
+      runModel(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.doVoters, args.iterations, args.symmetrical, args.numSimulations)
   plt.show()
 
 def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=False, iterations=10, symmetrical=False, numSimulations=1):
@@ -26,7 +34,7 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=
   if doPlot:
     if numSimulations==1:
       plt.show()
-    plt.plot(x)
+  return x
 
 gr = (math.sqrt(5) + 1) / 2
 
@@ -122,5 +130,6 @@ if __name__ == "__main__":
     parser.add_argument("--doPlot", "-p", help="Name of file to write plot to.", action="store_true")
     parser.add_argument("--doVoters", "-v", help="Plot voter curves.", action="store_true")
     parser.add_argument("--symmetrical", "-s", help="Constrain voter ideologies to be symetrical.", action="store_true")
+    parser.add_argument("--parallell", "-l", help="Parallellize running of the simulation.", action="store_true")
     args = parser.parse_args()
     main(args)

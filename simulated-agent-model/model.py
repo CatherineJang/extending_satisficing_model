@@ -18,7 +18,8 @@ def main(args):
       x = runModel(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.doVoters, args.iterations, args.symmetrical, args.numSimulations)
       if args.doPlot:
         plt.plot(x)
-  plt.show()
+  plt.savefig('../figs/simulation-figs/party-ideologies-full-symmetry/s-{}-r-{}.png'.format(args.sigmaHat, args.rationalizationFactor))
+  plt.clf()
 
 def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=False, iterations=10, symmetrical=False, numSimulations=1):
   population = np.random.normal(loc=0, scale=1, size = numVoters)
@@ -51,7 +52,7 @@ def graph(formula, x, hue, b):
     y = y + y[-2::-1]
     plt.plot(x, y, color=(int(b), hue, int(not b)), linewidth=1)
 
-def gss(f, a, b, tol=1e-3):
+def gss(f, a, b, tol=1e-2):
     """Golden-section search
     to find the minimum of f on [a,b]
     f: a strictly unimodal function on [a,b]
@@ -83,7 +84,7 @@ def iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInit
     Returns the new population
   """
 
-  # TODO: Step 1
+  # TODO: Step 1 for non-symetrical
   partyMean = partyMeanInitialGuess
   if symmetrical:
     def fToMinimize(partyMean):

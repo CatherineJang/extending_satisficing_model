@@ -10,7 +10,9 @@ def main(args):
     if args.doPlot:
       for x in results:
         plt.plot(x)
-      plt.show()
+      plt.savefig('../figs/simulation-figs/party-ideologies-full-symmetry/s-{}-r-{}.png'.format(args.sigmaHat, args.rationalizationFactor))
+      plt.clf()
+
   else:
     for i in range(args.numSimulations):
       x = runModel(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.doVoters, args.iterations, args.symmetrical, args.numSimulations)

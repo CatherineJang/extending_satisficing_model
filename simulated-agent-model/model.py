@@ -5,22 +5,24 @@ import argparse
 from joblib import Parallel, delayed
 
 def main(args):
+  figName = '../figs/simulation-figs/party-ideologies-full-symmetry/s-{}-r-{}.png'.format(args.sigmaHat, args.rationalizationFactor)
   if args.parallell:
-    results = Parallel(n_jobs=-1)(delayed(runModel)(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.doVoters, args.iterations, args.symmetrical, args.numSimulations) for i in range(args.numSimulations))
+    results = Parallel(n_jobs=3)(delayed(runModel)(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.doVoters, args.iterations, args.symmetrical, args.numSimulations, args.toMean) for i in range(args.numSimulations))
     if args.doPlot:
       for x in results:
         plt.plot(x)
-      plt.savefig('../figs/simulation-figs/party-ideologies-full-symmetry/s-{}-r-{}.png'.format(args.sigmaHat, args.rationalizationFactor))
+      plt.savefig(figName)
       plt.clf()
 
   else:
     for i in range(args.numSimulations):
-      x = runModel(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.doVoters, args.iterations, args.symmetrical, args.numSimulations)
+      x = runModel(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.doVoters, args.iterations, args.symmetrical, args.numSimulations, args.toMean)
       if args.doPlot:
         plt.plot(x)
-  plt.show()
+    plt.savefig(figName)
+    plt.clf()
 
-def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=False, iterations=10, symmetrical=False, numSimulations=1):
+def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=False, iterations=10, symmetrical=False, numSimulations=1, toMean=False):
   population = np.random.normal(loc=0, scale=1, size = numVoters)
   if symmetrical:
     population = np.absolute(population)
@@ -30,7 +32,7 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=
   x=[]
   x2=[]
   for i in range(1,iterations+1):
-    population, partyMeanInitialGuess = iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess, symmetrical)
+    population, partyMeanInitialGuess = iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess, symmetrical, toMean)
     x.append(partyMeanInitialGuess)
     x2.append(np.mean(population))
     if symmetrical:
@@ -51,7 +53,7 @@ def graph(formula, x, hue, b):
     y = y + y[-2::-1]
     plt.plot(x, y, color=(int(b), hue, int(not b)), linewidth=1)
 
-def gss(f, a, b, tol=1e-3):
+def gss(f, a, b, tol=1e-2):
     """Golden-section search
     to find the minimum of f on [a,b]
     f: a strictly unimodal function on [a,b]
@@ -77,15 +79,17 @@ def gss(f, a, b, tol=1e-3):
 
     return (b + a) / 2
 
-def iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess, symmetrical):
+def iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess, symmetrical, toMean):
   """
     population is a vector of ideologies of people in the population.
     Returns the new population
   """
 
-  # TODO: Step 1
+  # TODO: Step 1 for non-symetrical
   partyMean = partyMeanInitialGuess
-  if symmetrical:
+  if toMean:
+    partyMean=np.mean(population)
+  elif symmetrical:
     def fToMinimize(partyMean):
       # Gaussians for proportion of people at an ideology who are satisfied by each party and both
       party1SatisficeProbs = np.array(list(map(lambda x: math.exp(0-(x-partyMean)**2/sigmaHat/2), population)))
@@ -138,5 +142,6 @@ if __name__ == "__main__":
     parser.add_argument("--doVoters", "-v", help="Plot voter curves.", action="store_true")
     parser.add_argument("--symmetrical", "-s", help="Constrain voter ideologies to be symetrical.", action="store_true")
     parser.add_argument("--parallell", "-l", help="Parallellize running of the simulation (will be fast, and your computer will heat up).", action="store_true")
+    parser.add_argument("--toMean", "-m", help="Parties go to their voter bases mean instead of vote maximizer", action="store_true")
     args = parser.parse_args()
     main(args)

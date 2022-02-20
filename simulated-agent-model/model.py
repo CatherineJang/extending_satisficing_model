@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 from joblib import Parallel, delayed
-from pandas import concat
 
 def main(args):
   figName = '../figs/simulation-figs/party-ideologies-full-symmetry/s-{}-r-{}.png'.format(args.sigmaHat, args.rationalizationFactor)

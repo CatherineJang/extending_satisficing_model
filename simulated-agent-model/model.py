@@ -3,26 +3,39 @@ import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 from joblib import Parallel, delayed
+from pandas import concat
 
 def main(args):
   figName = '../figs/simulation-figs/party-ideologies-full-symmetry/s-{}-r-{}.png'.format(args.sigmaHat, args.rationalizationFactor)
+  vary = 's'
+  rationalizationFactors = [1.01, 1.02, 1.04, 1.06, 1.08, 1.1, 1.15, 1.2, 1.3, 1.4, 1.5, 1.6, 1.8, 2, 2.25, 2.5, 2.75, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 10] if (args.convergence and vary=='r') else [args.rationalizationFactor]
+  sigmaHats = [0.1, 0.11, 0.12, 0.14, 0.16, 0.18, 0.2, 0.25, 0.3, 0.4, 0.5, 0.7, 1] if (args.convergence and vary=='s') else [args.sigmaHat]
   if args.parallell:
-    results = Parallel(n_jobs=3)(delayed(runModel)(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.doVoters, args.iterations, args.symmetrical, args.numSimulations, args.toMean) for i in range(args.numSimulations))
-    if args.doPlot:
-      for x in results:
-        plt.plot(x)
-      plt.savefig(figName)
-      plt.clf()
+    for rationalizationFactor in rationalizationFactors:
+      for sigmaHat in sigmaHats:
+        print(sigmaHat, rationalizationFactor)
+        results = Parallel(n_jobs=3)(delayed(runModel)(sigmaHat, rationalizationFactor, args.numVoters, args.doPlot, args.doVoters, args.iterations, args.symmetrical, args.numSimulations, args.toMean, args.convergence) for j in range(args.numSimulations))
+        if args.doPlot:
+          for x in results:
+            plt.plot(x)
+        if args.convergence:
+          print(results)
+          plt.scatter([rationalizationFactor if vary=='r' else sigmaHat]*args.numSimulations, results)
+    plt.show()
 
   else:
     for i in range(args.numSimulations):
-      x = runModel(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.doVoters, args.iterations, args.symmetrical, args.numSimulations, args.toMean)
+      x = runModel(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.doVoters, args.iterations, args.symmetrical, args.numSimulations, args.toMean, args.convergence)
       if args.doPlot:
         plt.plot(x)
-    plt.savefig(figName)
-    plt.clf()
+      if args.convergence:
+        print(x)
+    if args.doPlot:
+      plt.savefig(figName)
+      plt.clf()
 
-def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=False, iterations=10, symmetrical=False, numSimulations=1, toMean=False):
+def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=False, iterations=10, symmetrical=False, numSimulations=1, toMean=False, convergence=False):
+  print(sigmaHat, rationalizationFactor)
   population = np.random.normal(loc=0, scale=1, size = numVoters)
   if symmetrical:
     population = np.absolute(population)
@@ -31,8 +44,16 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=
     plt.hist(population,list(map(lambda x: x/66, range(100))),color=(0.0,0,1,0.01))
   x=[]
   x2=[]
+  if convergence:
+    convergenceCounter=0
   for i in range(1,iterations+1):
-    population, partyMeanInitialGuess = iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess, symmetrical, toMean)
+    population, newPartyMean = iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess, symmetrical, toMean)
+    if convergence:
+      if newPartyMean<0.04:
+        return i
+      else:
+        convergenceCounter=0
+    partyMeanInitialGuess=newPartyMean
     x.append(partyMeanInitialGuess)
     x2.append(np.mean(population))
     if symmetrical:
@@ -43,6 +64,8 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=
     if numSimulations==1:
       plt.show()
       plt.plot(x2)
+  if convergence:
+    return iterations
   return x
 
 gr = (math.sqrt(5) + 1) / 2
@@ -143,5 +166,6 @@ if __name__ == "__main__":
     parser.add_argument("--symmetrical", "-s", help="Constrain voter ideologies to be symetrical.", action="store_true")
     parser.add_argument("--parallell", "-l", help="Parallellize running of the simulation (will be fast, and your computer will heat up).", action="store_true")
     parser.add_argument("--toMean", "-m", help="Parties go to their voter bases mean instead of vote maximizer", action="store_true")
+    parser.add_argument("--convergence", "-c", help="stop if converged and return convergence time", action="store_true")
     args = parser.parse_args()
     main(args)

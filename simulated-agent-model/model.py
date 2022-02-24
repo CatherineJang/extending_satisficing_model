@@ -44,15 +44,14 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=
     os.mkdir('../figs/simulation-figs/gif-{}-{}-{}'.format(sigmaHat, rationalizationFactor,numVoters))
   x=[]
   x2=[]
-  itnum = 1
   
   if convergence:
     convergenceCounter=0
-  for i in range(1,iterations+1):
+  for itnum in range(1,iterations+1):
     population, newPartyMean = iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess, symmetrical, toMean)
     if convergence:
       if newPartyMean<0.04:
-        return i
+        return itnum
       else:
         convergenceCounter=0
     partyMeanInitialGuess=newPartyMean
@@ -65,14 +64,13 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=
       negpop = np.negative(population)
       totalpop = np.concatenate((population,negpop), axis=None)
       plt.hist(totalpop,list(map(lambda x: (x-40)/66, range(80))))
-      plt.title('Iteration {}'.format(i))
+      plt.title('Iteration {}'.format(itnum))
       plt.xlabel("Population")
       plt.ylabel("Ideology")
       plt.xlim(-1.25,1.25)
       plt.ylim(0, 100000)
       plt.savefig('../figs/simulation-figs/gif-{}-{}-{}/iteration-{}.png'.format(sigmaHat, rationalizationFactor,numVoters, itnum))
       plt.cla()
-    itnum +=1
 
   if doPlot:
     if numSimulations==1:

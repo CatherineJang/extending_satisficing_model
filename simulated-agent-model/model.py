@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 from joblib import Parallel, delayed
+import os
 
 def main(args):
   if args.parallell:
@@ -21,15 +22,18 @@ def main(args):
   plt.savefig('../figs/simulation-figs/party-ideologies-full-symmetry/s-{}-r-{}.png'.format(args.sigmaHat, args.rationalizationFactor))
   plt.clf()
 
-def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=False, iterations=10, symmetrical=False, numSimulations=1):
+def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=False, iterations=20, symmetrical=False, numSimulations=1):
   population = np.random.normal(loc=0, scale=1, size = numVoters)
   if symmetrical:
     population = np.absolute(population)
   partyMeanInitialGuess = 1
   if doPlot and numSimulations==1:
-    plt.hist(population,list(map(lambda x: x/66, range(100))),color=(0.0,0,1,0.01))
+    plt.hist(population,list(map(lambda x: x/100, range(100))),color=(0.0,0,1,0.01))
+    os.mkdir('../figs/simulation-figs/gif-{}-{}-{}'.format(sigmaHat, rationalizationFactor,numVoters))
   x=[]
   x2=[]
+  itnum = 1
+  
   for i in range(1,iterations+1):
     population, partyMeanInitialGuess = iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess, symmetrical)
     x.append(partyMeanInitialGuess)
@@ -37,10 +41,22 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=
     if symmetrical:
       population = np.absolute(population)
     if doPlot and numSimulations==1:
-      plt.hist(population,list(map(lambda x: x/66, range(100))),color=(0.0,i/iterations,(1-i/iterations),(iterations/100+i/20)/iterations))
+      # add the negative population ideology back
+      negpop = np.negative(population)
+      totalpop = np.concatenate((population,negpop), axis=None)
+      plt.hist(totalpop,list(map(lambda x: (x-40)/66, range(80))))
+      plt.title('Iteration {}'.format(i))
+      plt.xlabel("Population")
+      plt.ylabel("Ideology")
+      plt.xlim(-1.25,1.25)
+      plt.ylim(0, 100000)
+      plt.savefig('../figs/simulation-figs/gif-{}-{}-{}/iteration-{}.png'.format(sigmaHat, rationalizationFactor,numVoters, itnum))
+      plt.cla()
+    itnum +=1
+
   if doPlot:
     if numSimulations==1:
-      plt.show()
+      # plt.show()
       plt.plot(x2)
   return x
 

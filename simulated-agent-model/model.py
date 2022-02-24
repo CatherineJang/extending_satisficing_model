@@ -13,7 +13,7 @@ def main(args):
   for rationalizationFactor in rationalizationFactors:
     for sigmaHat in sigmaHats:
       print(sigmaHat, rationalizationFactor)
-      results = Parallel(n_jobs=1+args.parallell)(delayed(runModel)(sigmaHat, rationalizationFactor, args.numVoters, args.doPlot, args.iterations, args.toMean, args.convergence) for j in range(args.numSimulations))
+      results = Parallel(n_jobs=1+args.parallell)(delayed(runModel)(sigmaHat, rationalizationFactor, args.numVoters, False, args.iterations, args.toMean, args.convergence) for j in range(args.numSimulations))
       if args.doPlot:
         for x in results:
           plt.plot(x)
@@ -22,12 +22,12 @@ def main(args):
         plt.scatter([rationalizationFactor if vary=='r' else sigmaHat]*args.numSimulations, results)
   plt.show()
 
-def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, iterations=20, toMean=False, convergence=False):
+def runModel(sigmaHat, rationalizationFactor, numVoters, forGif=False, iterations=20, toMean=False, convergence=False):
   """
   sigmaHat -- the standard deviation of the party satisficing curves.
   rationalizationFactor -- how powerfully voters "rationalize" their votes. They will move to a distance that is their old distance divided by r (same direction).
   numVoters --  The number of agents in the model.
-  doPlot -- Whether or not to plot the party mean over time.
+  forGif -- Whether or not to make a histogram to be made into a gif by Catherine's awesome gif code.
   iterations -- number of iterations to run the model for (sorta like election cycles... maybe).
   toMean -- if false parties go to vote maximizing ideology, if true parties go to mean ideology of their "half" of the population ideology distribution.
   convergence -- if true stop at convergence and return number of iterations, if false return vector with party ideology over time.  
@@ -36,7 +36,7 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, iteration
   np.random.normal()
   population = np.absolute(population)
   partyMeanInitialGuess = 1
-  if doPlot:
+  if forGif:
     plt.hist(population,list(map(lambda x: x/100, range(100))),color=(0.0,0,1,0.01))
     os.mkdir('../figs/simulation-figs/gif-{}-{}-{}'.format(sigmaHat, rationalizationFactor,numVoters))
   partyMeanList=[]
@@ -51,7 +51,7 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, iteration
     partyMeanList.append(partyMeanInitialGuess)
     populationMeanList.append(np.mean(population))
     population = np.absolute(population)
-    if doPlot:
+    if forGif:
       # add the negative population ideology back
       negpop = np.negative(population)
       totalpop = np.concatenate((population,negpop), axis=None)
@@ -162,7 +162,6 @@ if __name__ == "__main__":
     parser.add_argument("numVoters", help="Number of agents to initialize.", type=int)
     parser.add_argument("numSimulations", help="Number of simulations to run.", type=int)    
     parser.add_argument("--doPlot", "-p", help="Toggle plot for party ideologies over time.", action="store_true")
-    parser.add_argument("--doVoters", "-v", help="Plot voter curves. Does nothing currently.", action="store_true")
     parser.add_argument("--parallell", "-l", help="Parallellize running of the simulation (will be fast, and your computer will heat up).", action="store_true")
     parser.add_argument("--toMean", "-m", help="Parties go to their voter bases mean instead of vote maximizing ideology.", action="store_true")
     parser.add_argument("--convergence", "-c", help="Stop if converged and return convergence time. Only outputs graph when parallelized.", action="store_true")

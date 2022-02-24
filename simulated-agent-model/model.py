@@ -34,7 +34,7 @@ def main(args):
       plt.savefig(figName)
       plt.clf()
 
-def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=False, iterations=20, symmetrical=False, numSimulations=1):
+def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=False, iterations=20, symmetrical=False, numSimulations=1, toMean=False, convergence=False):
   population = np.random.normal(loc=0, scale=1, size = numVoters)
   if symmetrical:
     population = np.absolute(population)

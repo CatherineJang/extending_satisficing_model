@@ -15,7 +15,7 @@ def main(args):
 def makeGif(sigmaHat, rationalizationFactor, numVoters, iterations):
     # make filelist
     filelist = []
-    for i in range(1,iterations+1):
+    for i in range(iterations+1):
         filelist.append('../figs/simulation-figs/gif-{}-{}-{}/iteration-{}.png'.format(sigmaHat, rationalizationFactor, numVoters,i))
 
     # build gif

@@ -30,6 +30,8 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=
   if doPlot and numSimulations==1:
     plt.hist(population,list(map(lambda x: x/100, range(100))),color=(0.0,0,1,0.01))
     os.mkdir('../figs/simulation-figs/gif-{}-{}-{}'.format(sigmaHat, rationalizationFactor,numVoters))
+    figName = '../figs/simulation-figs/gif-{}-{}-{}/iteration-{}.png'.format(sigmaHat, rationalizationFactor,numVoters, 0)
+    popHistForGif(population, 0, numVoters, figName)
   x=[]
   x2=[]
   itnum = 1
@@ -41,17 +43,8 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=
     if symmetrical:
       population = np.absolute(population)
     if doPlot and numSimulations==1:
-      # add the negative population ideology back
-      negpop = np.negative(population)
-      totalpop = np.concatenate((population,negpop), axis=None)
-      plt.hist(totalpop,list(map(lambda x: (x-40)/66, range(80))))
-      plt.title('Iteration {}'.format(i))
-      plt.xlabel("Population")
-      plt.ylabel("Ideology")
-      plt.xlim(-1.25,1.25)
-      plt.ylim(0, 100000)
-      plt.savefig('../figs/simulation-figs/gif-{}-{}-{}/iteration-{}.png'.format(sigmaHat, rationalizationFactor,numVoters, itnum))
-      plt.cla()
+      figName = '../figs/simulation-figs/gif-{}-{}-{}/iteration-{}.png'.format(sigmaHat, rationalizationFactor,numVoters, itnum)
+      popHistForGif(population, i, numVoters, figName)
     itnum +=1
 
   if doPlot:
@@ -61,6 +54,21 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, doPlot=False, doVoters=
   return x
 
 gr = (math.sqrt(5) + 1) / 2
+
+def popHistForGif(population, i, numVoters, figName):
+  # add the negative population ideology back
+  negpop = np.negative(population)
+  totalpop = np.concatenate((population,negpop), axis=None)
+  ideologyPlotBound = 1.25 # histogram will be from -this to +this
+  numBuckets = 50
+  plt.hist(totalpop,list(map(lambda x: (x-numBuckets/2)/numBuckets*2*ideologyPlotBound, range(numBuckets))))
+  plt.title('Iteration {}'.format(i))
+  plt.xlabel("Population")
+  plt.ylabel("Ideology")
+  plt.xlim(0-ideologyPlotBound,ideologyPlotBound)
+  plt.ylim(0, numVoters)
+  plt.savefig(figName)
+  plt.cla()
 
 def graph(formula, x, hue, b):
     y = list(map(lambda x: formula(x/100), x))

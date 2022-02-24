@@ -5,7 +5,7 @@ import os
 
 def main(args):
     # make plots in folder (command: python3 gifs.py sigmaHat r-val iterations voters numSim -p -v -s)
-    runModel(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.iterations, args.numSimulations)
+    runModel(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.iterations)
     print("running here")
     # making gif
     makeGif(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.iterations)
@@ -25,8 +25,7 @@ def makeGif(sigmaHat, rationalizationFactor, numVoters, iterations):
         for idx, filename in enumerate(filelist):
             image = io.imread(filename)
             writer.append_data(image)
-            if idx%50 != 0:
-                os.remove(filename)
+            os.remove(filename)
 
     # # Remove files
     # os.rmdir('../figs/simulation-figs/gif-images/gif-{}-{}-{}'.format(sigmaHat, rationalizationFactor,numVoters))

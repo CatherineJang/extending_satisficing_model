@@ -5,7 +5,7 @@ import os
 
 def main(args):
     # make plots in folder (command: python3 gifs.py sigmaHat r-val iterations voters numSim -p -v -s)
-    runModel(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.doVoters, args.iterations, args.symmetrical, args.numSimulations)
+    runModel(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.iterations, args.numSimulations)
     print("running here")
     # making gif
     makeGif(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.iterations)
@@ -16,19 +16,20 @@ def makeGif(sigmaHat, rationalizationFactor, numVoters, iterations):
     # make filelist
     filelist = []
     for i in range(iterations+1):
-        filelist.append('../figs/simulation-figs/gif-{}-{}-{}/iteration-{}.png'.format(sigmaHat, rationalizationFactor, numVoters,i))
+        filelist.append('../figs/simulation-figs/gif-images/gif-{}-{}-{}/iteration-{}.png'.format(sigmaHat, rationalizationFactor, numVoters,i))
 
     # build gif
     print("compiling voter curve gif...")
     name = '../figs/simulation-figs/gifs/votercurve-{}-{}.gif'.format(sigmaHat,rationalizationFactor)
     with io.get_writer(name, mode='I') as writer:
-        for filename in filelist:
+        for idx, filename in enumerate(filelist):
             image = io.imread(filename)
             writer.append_data(image)
-            os.remove(filename)
+            if idx%50 != 0:
+                os.remove(filename)
 
-    # Remove files
-    os.rmdir('../figs/simulation-figs/gif-{}-{}-{}'.format(sigmaHat, rationalizationFactor,numVoters))
+    # # Remove files
+    # os.rmdir('../figs/simulation-figs/gif-images/gif-{}-{}-{}'.format(sigmaHat, rationalizationFactor,numVoters))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

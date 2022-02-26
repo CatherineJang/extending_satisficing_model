@@ -32,6 +32,7 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, forGif=False, iteration
   toMean -- if false parties go to vote maximizing ideology, if true parties go to mean ideology of their "half" of the population ideology distribution.
   convergence -- if true stop at convergence and return number of iterations, if false return vector with party ideology over time.  
   """
+  print(sigmaHat, rationalizationFactor)
   population = np.random.normal(loc=0, scale=1, size = numVoters)
   np.random.normal()
   population = np.absolute(population)
@@ -65,6 +66,7 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, forGif=False, iteration
       plt.cla()
 
   if convergence:
+    print(iterations)
     return iterations
   return partyMeanList
 

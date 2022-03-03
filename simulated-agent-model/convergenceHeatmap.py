@@ -31,10 +31,8 @@ def main(args):
   sns.heatmap(DFLoad, cmap="YlGnBu", norm=LogNorm(), cbar_kws={'ticks': [10,15,20,30,40,60,80,100], 'format':'%.i'})
   plt.xlabel("rationalization factor")
   plt.ylabel("sigma_h")
-  # INVERT Y AXIS
   ax = plt.gca()
   ax.invert_yaxis()
-  
   plt.savefig(filePath+'.png')
   plt.clf()
 

@@ -5,7 +5,7 @@ import os
 
 def main(args):
     # make plots in folder (command: python3 gifs.py sigmaHat r-val iterations numVoters)
-    runModel(args.sigmaHat, args.rationalizationFactor, args.numVoters, forGif=True, iterations=args.iterations, toMean=args.toMean)
+    runModel(sigmaHat=args.sigmaHat, rationalizationFactor=args.rationalizationFactor, numVoters=args.numVoters, forGif=True, iterations=args.iterations, toMean=args.toMean)
     print("running here")
     # making gif
     makeGif(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.iterations, args.toMean)

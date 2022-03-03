@@ -4,8 +4,9 @@ import imageio as io
 import os
 
 def main(args):
-    # make plots in folder (command: python3 gifs.py sigmaHat r-val iterations voters numSim -p -v -s)
-    runModel(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.doPlot, args.iterations, args.toMean)
+    # make plots in folder (command: python3 gifs.py sigmaHat r-val iterations voters)
+    print(args.toMean)
+    runModel(args.sigmaHat, args.rationalizationFactor, args.numVoters, True, args.iterations, args.toMean)
     print("running here")
     # making gif
     makeGif(args.sigmaHat, args.rationalizationFactor, args.numVoters, args.iterations, args.toMean)
@@ -36,11 +37,6 @@ if __name__ == "__main__":
     parser.add_argument("rationalizationFactor", help = "rationalization factor", type=float)
     parser.add_argument("iterations", help="Number of iterations per simulation.", type=int)
     parser.add_argument("numVoters", help="Number of agents to initialize.", type=int)
-    parser.add_argument("numSimulations", help="Number of simulations to run.", type=int)    
-    parser.add_argument("--doPlot", "-p", help="Name of file to write plot to.", action="store_true")
-    parser.add_argument("--doVoters", "-v", help="Plot voter curves.", action="store_true")
-    parser.add_argument("--symmetrical", "-s", help="Constrain voter ideologies to be symetrical.", action="store_true")
-    parser.add_argument("--parallell", "-l", help="Parallellize running of the simulation (will be fast, and your computer will heat up).", action="store_true")
     parser.add_argument("--toMean", "-m", help="Parties go to their voter bases mean instead of vote maximizing ideology.", action="store_true")
     args = parser.parse_args()
     main(args)

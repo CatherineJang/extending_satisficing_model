@@ -39,7 +39,9 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, forGif=False, iteration
   partyMeanInitialGuess = 1
   if forGif:
     plt.hist(population,list(map(lambda x: x/100, range(100))),color=(0.0,0,1,0.01))
-    os.mkdir('../figs/simulation-figs/gif-{}-{}-{}'.format(sigmaHat, rationalizationFactor,numVoters))
+    os.mkdir('../figs/simulation-figs/gif-images/gif-{}-{}-{}'.format(sigmaHat, rationalizationFactor,numVoters))
+    figName = '../figs/simulation-figs/gif-images/gif-{}-{}-{}/iteration-{}.png'.format(sigmaHat, rationalizationFactor,numVoters, 0)
+    popHistForGif(population, 0, numVoters, figName)
   partyMeanList=[]
   populationMeanList=[]
   
@@ -53,17 +55,8 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, forGif=False, iteration
     populationMeanList.append(np.mean(population))
     population = np.absolute(population)
     if forGif:
-      # add the negative population ideology back
-      negpop = np.negative(population)
-      totalpop = np.concatenate((population,negpop), axis=None)
-      plt.hist(totalpop,list(map(lambda x: (x-40)/66, range(80))))
-      plt.title('Iteration {}'.format(itnum))
-      plt.xlabel("Population")
-      plt.ylabel("Ideology")
-      plt.xlim(-1.25,1.25)
-      plt.ylim(0, 100000)
-      plt.savefig('../figs/simulation-figs/gif-{}-{}-{}/iteration-{}.png'.format(sigmaHat, rationalizationFactor,numVoters, itnum))
-      plt.cla()
+      figName = '../figs/simulation-figs/gif-images/gif-{}-{}-{}/iteration-{}.png'.format(sigmaHat, rationalizationFactor,numVoters, itnum)
+      popHistForGif(population, itnum, numVoters, figName)
 
   if convergence:
     print(iterations)
@@ -71,6 +64,21 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, forGif=False, iteration
   return partyMeanList
 
 gr = (math.sqrt(5) + 1) / 2
+
+def popHistForGif(population, i, numVoters, figName):
+  # add the negative population ideology back
+  negpop = np.negative(population)
+  totalpop = np.concatenate((population,negpop), axis=None)
+  ideologyPlotBound = 1.25 # histogram will be from -this to +this
+  numBuckets = 50
+  plt.hist(totalpop,list(map(lambda x: (x-numBuckets/2)/numBuckets*2*ideologyPlotBound, range(numBuckets))))
+  plt.title('Iteration {}'.format(i))
+  plt.xlabel("Population")
+  plt.ylabel("Ideology")
+  plt.xlim(0-ideologyPlotBound,ideologyPlotBound)
+  plt.ylim(0, numVoters)
+  plt.savefig(figName)
+  plt.cla()
 
 def graph(formula, x, hue, b):
     y = list(map(lambda x: formula(x/100), x))

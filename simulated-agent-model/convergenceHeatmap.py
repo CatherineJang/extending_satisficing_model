@@ -1,4 +1,3 @@
-from ast import parse
 import seaborn as sns; sns.set_theme()
 import matplotlib.pyplot as plt
 import argparse
@@ -20,7 +19,7 @@ def main(args):
   if args.loadFile == None:
     DF = makeDFs(args.numVoters, iterations=args.iterations, toMean=args.toMean)
 
-    filePath = '../figs/simulation-figs/Heatmaps/{}-{}-iter-Heat'.format(args.numVoters, args.iterations)
+    filePath = '../figs/simulation-figs/Heatmaps/{}{}-{}-iter-Heat'.format('m-' if args.toMean else '', args.numVoters, args.iterations)
 
     # save and read back in data
     DF.to_csv(filePath+'.csv')
@@ -28,7 +27,7 @@ def main(args):
     filePath = '../figs/simulation-figs/Heatmaps/' + args.loadFile
   DFLoad = pd.read_csv(filePath+'.csv', header=0, index_col=0)
 
-  sns.heatmap(DFLoad, cmap="YlGnBu", norm=LogNorm(), cbar_kws={'ticks': [6,8,10,20,30,40,60,80,100], 'format':'%.i'})
+  sns.heatmap(DFLoad, cmap="YlGnBu", norm=LogNorm(), cbar_kws={'ticks': [6,8,10,20,30,40,60,80,100,200,300,400,500,600,800,1000], 'format':'%.i'})
   plt.xlabel("Rationalization Factor")
   plt.ylabel("Sigma Hat")
   plt.title('Model Iterations Until Convergence')

@@ -8,10 +8,10 @@ from model import runModel
 
 from matplotlib.colors import LogNorm
 
-fineHeatMap = False
+fineHeatMap = True
 if fineHeatMap:
-  defaultSigmaHRange = [x/20.0 for x in range(1, 61, 1)]
-  defaultrfRange = [x/20.0 for x in range(21, 100, 1)]
+  defaultSigmaHRange = [x/20.0 for x in range(1, 41, 1)]
+  defaultrfRange = [x/20.0 for x in range(21, 81, 1)]
 else:
   defaultSigmaHRange = [x/20.0 for x in range(1, 41, 4)]
   defaultrfRange = [x/10.0 for x in range(11, 25, 4)]
@@ -28,11 +28,14 @@ def main(args):
     filePath = '../figs/simulation-figs/Heatmaps/' + args.loadFile
   DFLoad = pd.read_csv(filePath+'.csv', header=0, index_col=0)
 
-  sns.heatmap(DFLoad, cmap="YlGnBu", norm=LogNorm(), cbar_kws={'ticks': [10,15,20,30,40,60,80,100], 'format':'%.i'})
-  plt.xlabel("rationalization factor")
-  plt.ylabel("sigma_h")
+  sns.heatmap(DFLoad, cmap="YlGnBu", norm=LogNorm(), cbar_kws={'ticks': [6,8,10,20,30,40,60,80,100], 'format':'%.i'})
+  plt.xlabel("Rationalization Factor")
+  plt.ylabel("Sigma Hat")
+  plt.title('Model Iterations Until Convergence')
+
   ax = plt.gca()
   ax.invert_yaxis()
+  plt.tight_layout()
   plt.savefig(filePath+'.png')
   plt.clf()
 

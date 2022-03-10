@@ -27,7 +27,7 @@ def main(args):
     filePath = '../figs/simulation-figs/Heatmaps/' + args.loadFile
   DFLoad = pd.read_csv(filePath+'.csv', header=0, index_col=0)
 
-  sns.heatmap(DFLoad, cmap="YlGnBu", norm=LogNorm(), cbar_kws={'ticks': [6,8,10,20,30,40,60,80,100,200,300,400,500,600,800,1000], 'format':'%.i'})
+  sns.heatmap(DFLoad, cmap="YlGnBu", norm=LogNorm(), cbar_kws={'ticks': [6,8,10,20,30,40,60,80,100,200,300,400,600,800,1000], 'format':'%.i'})
   plt.xlabel("Rationalization Factor")
   plt.ylabel("Sigma Hat")
   plt.title('Model Iterations Until Convergence')

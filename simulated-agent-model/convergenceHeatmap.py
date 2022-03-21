@@ -2,6 +2,7 @@ import seaborn as sns; sns.set_theme()
 import matplotlib.pyplot as plt
 import argparse
 import pandas as pd
+from os.path import exists
 
 from model import runModel
 
@@ -22,10 +23,18 @@ def main(args):
     filePath = '../figs/simulation-figs/Heatmaps/{}{}-{}-iter-Heat'.format('m-' if args.toMean else '', args.numVoters, args.iterations)
 
     # save and read back in data
+    while exists(filePath+'.csv'):
+      filePath+='+'
     DF.to_csv(filePath+'.csv')
   else:
     filePath = '../figs/simulation-figs/Heatmaps/' + args.loadFile
   DFLoad = pd.read_csv(filePath+'.csv', header=0, index_col=0)
+  count = 1
+  while filePath[-1]=='+':
+    filePath=filePath[:-1]
+    DFLoad=DFLoad+pd.read_csv(filePath+'.csv', header=0, index_col=0)
+    count+=1
+  DFLoad = DFLoad/count
 
   sns.heatmap(DFLoad, cmap="YlGnBu", norm=LogNorm(), cbar_kws={'ticks': [6,8,10,20,30,40,60,80,100,200,300,400,600,800,1000], 'format':'%.i'})
   plt.xlabel("Rationalization Factor")

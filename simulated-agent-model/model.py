@@ -38,10 +38,12 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, forGif=False, iteration
   population = np.absolute(population)
   partyMeanInitialGuess = 1
   if forGif:
-    plt.hist(population,list(map(lambda x: x/100, range(100))),color=(0.0,0,1,0.01))
-    os.mkdir('../figs/simulation-figs/gif-images/gif-{}-{}-{}'.format(sigmaHat, rationalizationFactor,numVoters))
-    figName = '../figs/simulation-figs/gif-images/gif-{}-{}-{}/iteration-{}.png'.format(sigmaHat, rationalizationFactor,numVoters, 0)
-    popHistForGif(population, 0, numVoters, figName)
+    plt.hist(population,list(map(lambda x: x/100, range(100))),color=(0.0,0,1,0.5))
+    print("after yield")
+    os.mkdir('../figs/simulation-figs/gif-images/gif-{}-{}'.format(sigmaHat, rationalizationFactor))
+    figName = '../figs/simulation-figs/gif-images/gif-{}-{}/iteration-{}.png'.format(sigmaHat, rationalizationFactor, 0)
+    print("before yield agent")
+    yield popHistForGif(population, 0, numVoters, figName)
   partyMeanList=[]
   populationMeanList=[]
   
@@ -55,7 +57,7 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, forGif=False, iteration
     populationMeanList.append(np.mean(population))
     population = np.absolute(population)
     if forGif:
-      figName = '../figs/simulation-figs/gif-images/gif-{}-{}-{}/iteration-{}.png'.format(sigmaHat, rationalizationFactor,numVoters, itnum)
+      figName = '../figs/simulation-figs/gif-images/gif-{}-{}/iteration-{}.png'.format(sigmaHat, rationalizationFactor, itnum)
       popHistForGif(population, itnum, numVoters, figName)
 
   if convergence:

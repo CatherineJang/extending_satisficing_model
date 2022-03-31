@@ -1,3 +1,4 @@
+from os import mkdir
 from Gaussian import Gaussian, GaussGroup
 import math
 import matplotlib.pyplot as plt
@@ -5,14 +6,17 @@ import numpy as np
 import argparse
 
 def main(args):
-  runModel(args.sigmaHat, args.rationalizationFactor, args.doPlot, args.doVoters, args.iterations)
+  runModel(args.sigmaHat, args.rationalizationFactor, args.doPlot, args.doVoters, args.iterations, multiplier=args.multiplier)
 
-def runModel(sigmaHat, rationalizationFactor, doPlot=False, doVoters=False, iterations=5, doPartyMean=False, csvWrite=None, definition=1, retVal="NONE"):
+def runModel(sigmaHat, rationalizationFactor, doPlot=True, doVoters=False, iterations=5, doPartyMean=False, csvWrite=None, definition=1, retVal="NONE", multiplier=1000):
+  print("in gaussian model")
   population = GaussGroup(startPop=True)
   partyMeanInitialGuess = 1
   returnVec = []
   if doPlot:
-    graph(population.eval, list(range(-200, 0, definition)), 1, False)
+    print("before yield gaussian")
+    yield graph(population.eval, list(range(-2, 0, definition)), 1, False, multiplier)
+    print("after yield")
   if csvWrite:
     csvWrite.write('\n')
   for i in range(1,iterations+1):
@@ -23,7 +27,8 @@ def runModel(sigmaHat, rationalizationFactor, doPlot=False, doVoters=False, iter
     if doPlot:
       HDCutoff = int(max(-200, 0-1.5*partyMean))
       x = list(range(-200, HDCutoff, definition*3)) + list(range(HDCutoff, 0+definition, definition))
-      graph(population.eval, x, 1-1*i/iterations, False)
+      print(i)
+      yield graph(population.eval, x, 1-1*i/iterations, False, multiplier)
       if doVoters:
         graph(voters1.eval, x, 1-1*i/iterations, True)
         graph(voters1.eval, list(map(lambda a: 0-a, x)), 1-1*i/iterations, True)
@@ -43,19 +48,17 @@ def runModel(sigmaHat, rationalizationFactor, doPlot=False, doVoters=False, iter
       csvWrite.write(', {}'.format(partyMeanInitialGuess))
     # else:
     #   print(i, partyMeanInitialGuess, voters1.totalPopSize())
-  if doPlot:
-    plt.show()
   if retVal=="P-MEAN":
     returnVec.append(iteratePopulation(population, sigmaHat, rationalizationFactor, partyMeanInitialGuess, breakEarly=True))
   return returnVec
 
 gr = (math.sqrt(5) + 1) / 2
 
-def graph(formula, x, hue, b):
-    y = list(map(lambda x: formula(x/100), x))
+def graph(formula, x, hue, b, multiplier=1):
+    y = list(map(lambda elemOfDomain: multiplier * formula(elemOfDomain/100), x))
     x = x + list(map(lambda a: 0-a, x[-2::-1]))
     y = y + y[-2::-1]
-    plt.plot(x, y, color=(int(b), hue, int(not b)), linewidth=1)
+    plt.plot(np.array(x)/100, y, color=(int(b), hue, int(not b)), linewidth=1)
 
 def gss(f, a, b, tol=1e-3):
     """Golden-section search
@@ -167,6 +170,7 @@ if __name__ == "__main__":
     parser.add_argument("sigmaHat", help = "sigmaHat", type=float)
     parser.add_argument("rationalizationFactor", help = "rationalization factor", type=float)
     parser.add_argument("iterations", help="Number of iterations.", type=int)
+    parser.add_argument("multiplier", help="Multiplier of gaussians graph", type=int)
     parser.add_argument("--doPlot", "-p", help="Name of file to write plot to.", action="store_true")
     parser.add_argument("--doVoters", "-v", help="Plot voter curves.", action="store_true")
     args = parser.parse_args()

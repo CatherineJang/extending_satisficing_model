@@ -3,27 +3,27 @@ import argparse
 import matplotlib.pyplot as plt
 
 
-sys.path.insert(1, '/Users/catherinejang/Desktop/extending_satisficing_model/simulated-agent-model')
+sys.path.insert(1, '/Users/ericthompson-martin/Desktop/SP2022/polarization-project/extending_satisficing_model/simulated-agent-model')
 # print(sys.path)
 from model import runModel as runAgentModel
 
-sys.path.remove('/Users/catherinejang/Desktop/extending_satisficing_model/simulated-agent-model')
+sys.path.remove('/Users/ericthompson-martin/Desktop/SP2022/polarization-project/extending_satisficing_model/simulated-agent-model')
 # print(sys.path)
-sys.path.insert(1, '/Users/catherinejang/Desktop/extending_satisficing_model/precise-gaussian-model')
+sys.path.insert(1, '/Users/ericthompson-martin/Desktop/SP2022/polarization-project/extending_satisficing_model/precise-gaussian-model')
 # print(sys.path)
 from gaussianModel import runModel as runGaussianModel
 
 
 def main(args):
     # make plots in folder (command: python3 gifs.py sigmaHat r-val iterations numVoters)
-    gaussianGraphs = runGaussianModel(args.sigmaHat, args.rationalizationFactor, args.doPlot, multiplier=1000)
-    agentBasedGraphs = runAgentModel(sigmaHat=args.sigmaHat, rationalizationFactor=args.rationalizationFactor, numVoters=args.numVoters, forGif=True, iterations=args.iterations, toMean=args.toMean)
+    gaussianGraphs = runGaussianModel(args.sigmaHat, args.rationalizationFactor, args.doPlot, multiplier=10000, iterations=args.iterations)
+    agentBasedGraphs = runAgentModel(sigmaHat=args.sigmaHat**0.5, rationalizationFactor=args.rationalizationFactor, numVoters=args.numVoters, forGif=True, iterations=args.iterations, toMean=args.toMean)
 
 
     for idx,(gaussianGraphs, agentBasedGraphs) in enumerate(zip(gaussianGraphs, agentBasedGraphs)):
         # plt.savefig('overlay-{}-{}-iteration-{}'.format(args.sigmaHat, args.rationalizationFactor, idx))
         print("before show plot")
-        # plt.show()
+        plt.show()
     # make voter ideology plots
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

@@ -40,7 +40,7 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, forGif=False, iteration
   if forGif:
     plt.hist(population,list(map(lambda x: x/100, range(100))),color=(0.0,0,1,0.5))
     print("after yield")
-    os.mkdir('../figs/simulation-figs/gif-images/gif-{}-{}'.format(sigmaHat, rationalizationFactor))
+    # os.mkdir('../figs/simulation-figs/gif-images/gif-{}-{}'.format(sigmaHat, rationalizationFactor))
     figName = '../figs/simulation-figs/gif-images/gif-{}-{}/iteration-{}.png'.format(sigmaHat, rationalizationFactor, 0)
     print("before yield agent")
     yield popHistForGif(population, 0, numVoters, figName)
@@ -58,7 +58,7 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, forGif=False, iteration
     population = np.absolute(population)
     if forGif:
       figName = '../figs/simulation-figs/gif-images/gif-{}-{}/iteration-{}.png'.format(sigmaHat, rationalizationFactor, itnum)
-      popHistForGif(population, itnum, numVoters, figName)
+      yield popHistForGif(population, itnum, numVoters, figName)
 
   if convergence:
     print(iterations)
@@ -79,8 +79,8 @@ def popHistForGif(population, i, numVoters, figName):
   plt.ylabel("Ideology")
   plt.xlim(0-ideologyPlotBound,ideologyPlotBound)
   plt.ylim(0, numVoters)
-  plt.savefig(figName)
-  plt.cla()
+  # plt.savefig(figName)
+  # plt.cla()
 
 def graph(formula, x, hue, b):
     y = list(map(lambda x: formula(x/100), x))

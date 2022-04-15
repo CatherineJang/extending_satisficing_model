@@ -8,7 +8,7 @@ from model import runModel
 from matplotlib.colors import LogNorm, Normalize
 from matplotlib.ticker import MaxNLocator
 
-fineHeatMap = True
+fineHeatMap = False
 if fineHeatMap:
   defaultSigmaHRange = [x/20.0 for x in range(1, 61, 1)]
   defaultrfRange = [x/20.0 for x in range(21, 100, 1)]

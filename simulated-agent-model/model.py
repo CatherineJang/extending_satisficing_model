@@ -34,7 +34,6 @@ def runModel(sigmaHat, rationalizationFactor, numVoters, forGif=False, iteration
   """
   print(sigmaHat, rationalizationFactor)
   population = np.random.normal(loc=0, scale=1, size = numVoters)
-  np.random.normal()
   population = np.absolute(population)
   partyMeanInitialGuess = 1
   if forGif:

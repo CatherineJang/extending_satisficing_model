@@ -1,5 +1,6 @@
 import sys
 import argparse
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 
@@ -17,12 +18,13 @@ from gaussianModel import runModel as runGaussianModel
 def main(args):
     # make plots in folder (command: python3 gifs.py sigmaHat r-val iterations numVoters)
     gaussianGraphs = runGaussianModel(args.sigmaHat, args.rationalizationFactor, args.doPlot, multiplier=10000, iterations=args.iterations)
-    agentBasedGraphs = runAgentModel(sigmaHat=args.sigmaHat**0.5, rationalizationFactor=args.rationalizationFactor, numVoters=args.numVoters, forGif=True, iterations=args.iterations, toMean=args.toMean)
+    agentBasedGraphs = runAgentModel(sigmaHat=args.sigmaHat, rationalizationFactor=args.rationalizationFactor, numVoters=args.numVoters, forGif=True, iterations=args.iterations, toMean=args.toMean)
 
 
     for idx,(gaussianGraphs, agentBasedGraphs) in enumerate(zip(gaussianGraphs, agentBasedGraphs)):
         # plt.savefig('overlay-{}-{}-iteration-{}'.format(args.sigmaHat, args.rationalizationFactor, idx))
         print("before show plot")
+        plt.gca().yaxis.set_major_formatter(mpl.ticker.FuncFormatter(lambda x, pos: '{}'.format(x/args.numVoters)))
         plt.show()
     # make voter ideology plots
 if __name__ == "__main__":
